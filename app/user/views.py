@@ -21,5 +21,11 @@ def create_model():
 def add_user():
     user=User()
     user.nickname='asdfaf'
+    #自定义save方法
     user.save()
     return '创建用户成功'
+
+@user_bp.route('/dropdb')
+def drop_all():
+    models.drop_all()
+    return '删库，跑路'

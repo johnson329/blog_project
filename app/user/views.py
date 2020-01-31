@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, url_for
+from flask import Blueprint, redirect, url_for, request
 from flask import render_template
 
 from app.user.models import models, User
@@ -10,6 +10,11 @@ user_bp = Blueprint('user', __name__)
 def hello_world():
     # Flask有个template_folder属性，默认是app所在脚本的templates目录，render_template会去这个位置找index.html
     # 可以通过设置template_folder属性修改templates位置，static_folder同理
+
+
+    #获取文件，或者post表单
+    print(request.files)
+    print(request.form)
     return render_template('user/index.html', hello='hello,world')
 
 

@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask import render_template
 
-from app.user.models import models
+from app.user.models import models, User
 
 user_bp = Blueprint('user', __name__)
 
@@ -16,3 +16,10 @@ def hello_world():
 def create_model():
     models.create_all()
     return '创建成功'
+
+@user_bp.route('/adduser')
+def add_user():
+    user=User()
+    user.nickname='asdfaf'
+    user.save()
+    return '创建用户成功'

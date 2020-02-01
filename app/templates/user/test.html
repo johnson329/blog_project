@@ -1,0 +1,38 @@
+{% extends 'user/base.html' %}
+
+{% block content %}
+    {% for i in mylist %}
+        <p>{{ i }}</p>
+    {% endfor %}
+
+    {% for i in mylist %}
+        {% if loop.first %}
+            <p style="color: red">{{ i }}</p>
+        {% elif loop.last %}
+        <p style="color: gold;">{{ loop.index }}:{{ loop.index0 }}:{{ loop.revindex }}:{{ loop.revindex0 }}:{{ i }}</p>
+        {% else %}
+{#        过滤器    #}
+{#        capitalize,lower,upper,title,trim,reverse,format,striptags#}
+        <p style="color: #177199">{{ i |upper}}</p>
+        {% endif %}
+    {% endfor %}
+
+    {% include 'user/test_include.html' %}
+
+    {% from 'user/test_marc.html' import hello %}
+    {{ hello(wuqing) }}
+    {{ hello(wuqing) }}
+    {{ hello(wuqing) }}
+    {{ hello(wuqing) }}
+    {{ hello(wuqing) }}
+    {{ hello(wuqing) }}
+    {{ hello(wuqing) }}
+    {{ hello(wuqing) }}
+    {{ hello(wuqing) }}
+    {{ hello(wuqing) }}
+{% endblock %}
+
+
+
+
+

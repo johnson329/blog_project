@@ -11,8 +11,7 @@ def hello_world():
     # Flask有个template_folder属性，默认是app所在脚本的templates目录，render_template会去这个位置找index.html
     # 可以通过设置template_folder属性修改templates位置，static_folder同理
 
-
-    #获取文件，或者post表单
+    # 获取文件，或者post表单
     print(request.files)
     print(request.form)
     return render_template('user/index.html', hello='hello,world')
@@ -61,14 +60,22 @@ def get_any(xxxx):
     # 根据视图函数的endpoint生成url,endpoint默认为函数名字，可以通过endpoint属性修改
     # return redirect(url_for('user.hello_world'))
 
-    #还可以传参数
-    #蓝图名字.endpoint
-    return redirect(url_for('user.get_name',name='a'))
+    # 还可以传参数
+    # 蓝图名字.endpoint
+    return redirect(url_for('user.get_name', name='a'))
 
-#异常处理与异常处理
+
+# 异常处理与异常处理
 @user_bp.route('/exception')
 def exception_handler():
     abort(401)
+
+
+@user_bp.route('/template')
+def myrender_template():
+    mylist = list(range(10))
+    return render_template('user/test.html', mylist=mylist)
+
 
 @user_bp.errorhandler(401)
 def handle_401(e):

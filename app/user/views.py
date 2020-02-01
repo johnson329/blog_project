@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, url_for, request
+from flask import Blueprint, redirect, url_for, request, abort
 from flask import render_template
 
 from app.user.models import models, User
@@ -64,3 +64,14 @@ def get_any(xxxx):
     #还可以传参数
     #蓝图名字.endpoint
     return redirect(url_for('user.get_name',name='a'))
+
+#异常处理与异常处理
+@user_bp.route('/exception')
+def exception_handler():
+    abort(401)
+
+@user_bp.errorhandler(401)
+def handle_401(e):
+    print(e)
+    print(type(e))
+    return '401'

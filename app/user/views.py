@@ -82,3 +82,10 @@ def handle_401(e):
     print(e)
     print(type(e))
     return '401'
+
+
+@user_bp.route('/bootstrap')
+def bootstrap_test():
+    return render_template('mybootstrap/index.html')
+
+

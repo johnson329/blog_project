@@ -89,3 +89,7 @@ def bootstrap_test():
     return render_template('mybootstrap/index.html')
 
 
+@user_bp.route('/static_test')
+def static_test():
+    return render_template('user/test.html')
+

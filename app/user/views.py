@@ -93,3 +93,13 @@ def bootstrap_test():
 def static_test():
     return render_template('user/test.html')
 
+
+# 分页器
+@user_bp.route("/paginate/")
+def pagi_nate():
+    'http://127.0.0.1:5000/paginate/?page=1&per_page=2'
+    '存在问题，没有的页数返回404,通过全局异常给返回到首页，或者返回到第一页'
+    '限制一页显示的数目'
+    user = User.query.paginate().items
+    print(user)
+    return render_template('user/pagination.html', users=user)

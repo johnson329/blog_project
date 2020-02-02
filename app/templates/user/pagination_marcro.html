@@ -1,0 +1,16 @@
+{##宏模板来自paginate源码#}
+{% macro render_pagination(pagination, endpoint) %}
+    <div class=pagination>
+        {%- for page in pagination.iter_pages() %}
+            {% if page %}
+                {% if page != pagination.page %}
+                    <a href="{{ url_for(endpoint, page=page,per_page=pagination.per_page) }}">{{ page }}</a>
+                {% else %}
+                    <strong>{{ page }}</strong>
+                {% endif %}
+            {% else %}
+                <span class=ellipsis>…</span>
+            {% endif %}
+        {%- endfor %}
+    </div>
+{% endmacro %}

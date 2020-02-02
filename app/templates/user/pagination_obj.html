@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% for user in user_pagination.items %}
+    <p>{{ user.nickname }}</p>
+
+{% endfor %}
+
+{% from 'user/pagination_marcro.html' import render_pagination %}
+{{ render_pagination(user_pagination,endpoint) }}
+
+</body>
+</html>

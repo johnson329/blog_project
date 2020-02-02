@@ -1,5 +1,6 @@
 from flask import Blueprint, redirect, url_for, request, abort
 from flask import render_template
+from sqlalchemy import text
 
 from app.user.models import models, User
 
@@ -100,6 +101,19 @@ def pagi_nate():
     'http://127.0.0.1:5000/paginate/?page=1&per_page=2'
     '存在问题，没有的页数返回404,通过全局异常给返回到首页，或者返回到第一页'
     '限制一页显示的数目'
-    user = User.query.paginate().items
+    'page-1可能为负数'
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 2, type=int)
+    # order_by在offset之前
+    user = User.query.order_by(text('-id')).offset(per_page*(page-1)).limit(per_page)
     print(user)
     return render_template('user/pagination.html', users=user)
+
+@user_bp.route('/pagenation_obj/')
+def pagination_obj():
+    user_pagination=User.query.paginate()
+    endpoint='user.pagination_obj'
+
+
+
+    return render_template('user/pagination_obj.html',endpoint=endpoint,user_pagination=user_pagination)

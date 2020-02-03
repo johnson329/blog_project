@@ -2,6 +2,7 @@ from flask import Blueprint, redirect, url_for, request, abort
 from flask import render_template
 from sqlalchemy import text
 
+from app.config import appid
 from app.user.models import models, User
 
 user_bp = Blueprint('user', __name__)
@@ -105,15 +106,45 @@ def pagi_nate():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 2, type=int)
     # order_by在offset之前
-    user = User.query.order_by(text('-id')).offset(per_page*(page-1)).limit(per_page)
+    user = User.query.order_by(text('-id')).offset(per_page * (page - 1)).limit(per_page)
     print(user)
     return render_template('user/pagination.html', users=user)
 
+
 @user_bp.route('/pagenation_obj/')
 def pagination_obj():
-    user_pagination=User.query.paginate()
-    endpoint='user.pagination_obj'
+    user_pagination = User.query.paginate()
+    endpoint = 'user.pagination_obj'
+
+    return render_template('user/pagination_obj.html', endpoint=endpoint, user_pagination=user_pagination)
 
 
+@user_bp.route('/pay/')
+def go_to_pay():
+    from alipay import AliPay
+    a_p_key = r'C:\Users\jiangsheng\PycharmProjects\blog_project\app\config\app_private_key.pem'
+    alipay_pub = r'C:\Users\jiangsheng\PycharmProjects\blog_project\app\config\app_public_key.pem'
+    with open(a_p_key) as f:
+        app_private_key_string = f.read()
+    with open(alipay_pub) as f:
+        alipay_public_key_string = f.read()
 
-    return render_template('user/pagination_obj.html',endpoint=endpoint,user_pagination=user_pagination)
+    alipay = AliPay(
+        appid=appid,
+        app_notify_url=None,  # the default notify path
+        app_private_key_string=app_private_key_string,
+        # alipay public key, do not use your own public key!
+        alipay_public_key_string=alipay_public_key_string,
+        sign_type="RSA2",  # RSA or RSA2
+        debug=False  # False by default,开发者模式
+    )
+
+    order_string = alipay.api_alipay_trade_page_pay(
+        out_trade_no='123123',  # 订单id
+        total_amount=str(0.01),  # 订单实付款
+        subject='测试页面',  # 订单标题
+        return_url='http://127.0.0.1:5000/hello',
+        notify_url=None  # 可选, 不填则使用默认notify url
+    )
+    pay_url = 'https://openapi.alipaydev.com/gateway.do?' + order_string
+    return render_template('user/pay.html', pay_url=pay_url)

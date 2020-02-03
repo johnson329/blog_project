@@ -1,8 +1,9 @@
+from alipay import AliPay
 from flask import Blueprint, redirect, url_for, request, abort
 from flask import render_template
 from sqlalchemy import text
 
-from app.config import appid
+from app.config.settings import appid
 from app.user.models import models, User
 
 user_bp = Blueprint('user', __name__)
@@ -121,9 +122,11 @@ def pagination_obj():
 
 @user_bp.route('/pay/')
 def go_to_pay():
-    from alipay import AliPay
+    # 传入订单id，检查订单id是否存在
+    #检查订单状态，已支付 未支付，取消等等
+
     a_p_key = r'C:\Users\jiangsheng\PycharmProjects\blog_project\app\config\app_private_key.pem'
-    alipay_pub = r'C:\Users\jiangsheng\PycharmProjects\blog_project\app\config\app_public_key.pem'
+    alipay_pub = r'C:\Users\jiangsheng\PycharmProjects\blog_project\app\config\alipay_public.pem'
     with open(a_p_key) as f:
         app_private_key_string = f.read()
     with open(alipay_pub) as f:
@@ -140,11 +143,49 @@ def go_to_pay():
     )
 
     order_string = alipay.api_alipay_trade_page_pay(
-        out_trade_no='123123',  # 订单id
-        total_amount=str(0.01),  # 订单实付款
+        out_trade_no=781,  # 订单id
+        total_amount=str(11),  # 订单实付款
         subject='测试页面',  # 订单标题
-        return_url='http://127.0.0.1:5000/hello',
+        return_url='http://127.0.0.1:5000/check',
         notify_url=None  # 可选, 不填则使用默认notify url
     )
     pay_url = 'https://openapi.alipaydev.com/gateway.do?' + order_string
     return render_template('user/pay.html', pay_url=pay_url)
+
+@user_bp.route('/check')
+def get_return_params():
+    '''
+    订单状态修改为已支付
+    :return:
+    '''
+    print(request.args)
+    order_id = request.args.get('out_trade_no')
+    a_p_key = r'C:\Users\jiangsheng\PycharmProjects\blog_project\app\config\app_private_key.pem'
+    alipay_pub = r'C:\Users\jiangsheng\PycharmProjects\blog_project\app\config\alipay_public.pem'
+    with open(a_p_key) as f:
+        app_private_key_string = f.read()
+    with open(alipay_pub) as f:
+        alipay_public_key_string = f.read()
+    print(alipay_public_key_string)
+    print(app_private_key_string)
+    alipay = AliPay(
+        appid=appid,  # 应用APPID
+        app_notify_url=None,  # 默认回调url
+        app_private_key_string=app_private_key_string,  # 应用私钥文件路径
+        # 支付宝的公钥文件，验证支付宝回传消息使用，不是你自己的公钥,
+        alipay_public_key_string=alipay_public_key_string,
+        sign_type="RSA2",  # RSA 或者 RSA2
+        debug=True  # 默认False，False代表线上环境，True代表沙箱环境
+    )
+    # alipay = AliPay(
+    #     appid=appid,
+    #     app_notify_url=None,  # the default notify path
+    #     app_private_key_string=app_private_key_string,
+    #     # alipay public key, do not use your own public key!
+    #     alipay_public_key_string=alipay_public_key_string,
+    #     sign_type="RSA2",  # RSA or RSA2
+    #     debug=False  # False by default,开发者模式
+    # )
+    response = alipay.api_alipay_trade_query(out_trade_no=order_id)
+    print(response.json())
+    return '会掉成功'

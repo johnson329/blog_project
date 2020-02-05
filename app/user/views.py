@@ -1,10 +1,13 @@
+import json
+
 from alipay import AliPay
 from flask import Blueprint, redirect, url_for, request, abort
 from flask import render_template
+from flask.views import MethodView
 from sqlalchemy import text
 
 from app.config.settings import appid
-from app.user.models import models, User
+from app.user.models import models, User, Post, Group
 
 user_bp = Blueprint('user', __name__)
 
@@ -123,7 +126,7 @@ def pagination_obj():
 @user_bp.route('/pay/')
 def go_to_pay():
     # 传入订单id，检查订单id是否存在
-    #检查订单状态，已支付 未支付，取消等等
+    # 检查订单状态，已支付 未支付，取消等等
 
     a_p_key = r'C:\Users\jiangsheng\PycharmProjects\blog_project\app\config\app_private_key.pem'
     alipay_pub = r'C:\Users\jiangsheng\PycharmProjects\blog_project\app\config\alipay_public.pem'
@@ -152,6 +155,8 @@ def go_to_pay():
     pay_url = 'https://openapi.alipaydev.com/gateway.do?' + order_string
     return render_template('user/pay.html', pay_url=pay_url)
 
+
+# 登录才可以调用
 @user_bp.route('/check')
 def get_return_params():
     '''
@@ -188,4 +193,46 @@ def get_return_params():
     # )
     response = alipay.api_alipay_trade_query(out_trade_no=order_id)
     print(response.json())
-    return '会掉成功'
+    return '回调成功'
+
+
+class PostView(MethodView):
+    def get(self):
+        print(User.post)
+        return render_template('user/post.html')
+
+    def post(self):
+        form_obj = request.form
+        user_obj = User.query.filter_by(nickname='8').one()
+        print(user_obj.post)
+        title = form_obj.get('posts')
+        post_obj = Post()
+        post_obj.user = user_obj
+        post_obj.title = title
+        post_obj.save()
+
+        return redirect(url_for('user.hello_world'))
+
+
+class RegisterView(MethodView):
+    def get(self):
+        group_obj = Group.query.filter_by(id=2).one()
+        print(group_obj.user)
+        return '123'
+
+    def post(self):
+        data = request.data.decode()
+        data=json.loads(data)
+        print(data)
+        group_obj = Group.query.filter_by(name='admin').one()
+        print(group_obj)
+        nickname = data.get('nickname')
+        user_obj = User()
+        user_obj.nickname = nickname
+        user_obj.group = [group_obj]
+        user_obj.save()
+        return 'aa'
+
+
+user_bp.add_url_rule('/register', view_func=RegisterView.as_view('register'))
+user_bp.add_url_rule('/posts', view_func=PostView.as_view('posts'))

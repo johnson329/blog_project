@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% if is_login %}
+    <a class="btn" href="#">Logout</a>
+    <a>
+    <img src="{{ avatar }}" alt="asdf">
+    </a>
+
+{% else %}
+    <a class="btn" href="{{ url_for('github.github_login') }}">Login with GitHub</a>
+{% endif %}
+
+
+</body>
+</html>

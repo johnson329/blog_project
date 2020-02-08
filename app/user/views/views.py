@@ -7,7 +7,8 @@ from flask.views import MethodView
 from sqlalchemy import text
 
 from app.config.settings import appid
-from app.user.models import models, User, Post, Group
+from app.user.models.models import models, User, Post
+
 
 user_bp = Blueprint('user', __name__)
 
@@ -214,25 +215,4 @@ class PostView(MethodView):
         return redirect(url_for('user.hello_world'))
 
 
-class RegisterView(MethodView):
-    def get(self):
-        group_obj = Group.query.filter_by(id=2).one()
-        print(group_obj.user)
-        return '123'
-
-    def post(self):
-        data = request.data.decode()
-        data=json.loads(data)
-        print(data)
-        group_obj = Group.query.filter_by(name='admin').one()
-        print(group_obj)
-        nickname = data.get('nickname')
-        user_obj = User()
-        user_obj.nickname = nickname
-        user_obj.group = [group_obj]
-        user_obj.save()
-        return 'aa'
-
-
-user_bp.add_url_rule('/register', view_func=RegisterView.as_view('register'))
 user_bp.add_url_rule('/posts', view_func=PostView.as_view('posts'))

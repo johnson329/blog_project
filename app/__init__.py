@@ -1,7 +1,9 @@
-from flask import Flask
+from flask import Flask, session, g
+
 
 from app.extenstion import init_ext
-from app.user import init_view
+from app.user.models.models import User
+from app.user.views import init_view
 
 
 def create_app():
@@ -12,6 +14,8 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
     #toordebug需要
     app.config['SECRET_KEY']='SSSSSSSSSSSSSS'
+    app.config['GITHUB_CLIENT_ID'] = '1'
+    app.config['GITHUB_CLIENT_SECRET'] = '2'
     app.debug=True
     app.config['DEBUG_TB_PROFILER_ENABLED']=True
 
@@ -22,3 +26,10 @@ def create_app():
 
 
 app = create_app()
+
+
+@app.before_request
+def before_request():
+    g.user = None
+    if 'user_id' in session:
+        g.user = User.query.get(session['user_id'])
